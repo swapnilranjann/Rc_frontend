@@ -66,44 +66,78 @@ const PopularRoutes = () => {
             <div className="routes-title-section">
               <h1 className="routes-main-title">Popular Routes</h1>
               <p className="routes-subtitle">Discover India's most scenic motorcycle routes</p>
+              <div className="routes-badges">
+                <span className="route-badge">Mountain Routes</span>
+                <span className="route-badge">Desert Adventures</span>
+                <span className="route-badge">Coastal Rides</span>
+                <span className="route-badge">Forest Trails</span>
+              </div>
             </div>
             
-            {/* Search and Filters */}
-            <div className="routes-filters">
-              <div className="search-box">
-                <input
-                  type="text"
-                  placeholder="Search routes, cities..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="routes-search-input"
-                />
+            {/* Enhanced Search and Filters */}
+            <div className="routes-filters-enhanced">
+              <div className="search-section">
+                <div className="search-box-enhanced">
+                  <span className="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Search routes, cities, or destinations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="routes-search-input-enhanced"
+                  />
+                  {searchQuery && (
+                    <button 
+                      className="clear-search"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               </div>
               
-              <div className="filter-group">
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="all">All Difficulties</option>
-                  <option value="Easy">Easy</option>
-                  <option value="Moderate">Moderate</option>
-                  <option value="Challenging">Challenging</option>
-                </select>
+              <div className="filters-section">
+                <div className="filter-group-enhanced">
+                  <label className="filter-label">Difficulty</label>
+                  <select
+                    value={selectedDifficulty}
+                    onChange={(e) => setSelectedDifficulty(e.target.value)}
+                    className="filter-select-enhanced"
+                  >
+                    <option value="all">All Difficulties</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Challenging">Challenging</option>
+                  </select>
+                </div>
                 
-                <select
-                  value={selectedSeason}
-                  onChange={(e) => setSelectedSeason(e.target.value)}
-                  className="filter-select"
+                <div className="filter-group-enhanced">
+                  <label className="filter-label">Best Season</label>
+                  <select
+                    value={selectedSeason}
+                    onChange={(e) => setSelectedSeason(e.target.value)}
+                    className="filter-select-enhanced"
+                  >
+                    <option value="all">All Seasons</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Monsoon">Monsoon</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Spring">Spring</option>
+                    <option value="Autumn">Autumn</option>
+                  </select>
+                </div>
+                
+                <button 
+                  className="reset-filters-btn"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedDifficulty('all');
+                    setSelectedSeason('all');
+                  }}
                 >
-                  <option value="all">All Seasons</option>
-                  <option value="Summer">Summer</option>
-                  <option value="Monsoon">Monsoon</option>
-                  <option value="Winter">Winter</option>
-                  <option value="Spring">Spring</option>
-                  <option value="Autumn">Autumn</option>
-                </select>
+                  Reset Filters
+                </button>
               </div>
             </div>
           </div>

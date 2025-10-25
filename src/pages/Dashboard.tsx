@@ -10,6 +10,7 @@ import MessagesModal from '../components/MessagesModal';
 import NotificationsModal from '../components/NotificationsModal';
 import MotorcycleLoader from '../components/ui/MotorcycleLoader';
 import PageTransition from '../components/PageTransition';
+import GettingStartedGuide from '../components/GettingStartedGuide';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -212,7 +213,7 @@ const Dashboard = () => {
       <div className="dashboard">
       {/* Top Bar */}
       <div className="top-bar">
-        <div className="logo">🏍️ RiderConnect</div>
+        <div className="logo">RiderConnect</div>
         <div className="search-bar">
           <input type="text" placeholder="Search communities, riders, events..." />
           <span className="search-icon">🔍</span>
@@ -235,25 +236,30 @@ const Dashboard = () => {
         {/* Sidebar */}
         <aside className="sidebar">
           <Link to="/dashboard" className="sidebar-item active">
-            <span>🏠</span> <span>Feed</span>
+            <span>Feed</span>
           </Link>
           <Link to="/communities" className="sidebar-item">
-            <span>🏘️</span> <span>Communities</span>
+            <span>Communities</span>
           </Link>
           <Link to="/events" className="sidebar-item">
-            <span>📅</span> <span>Events</span>
+            <span>Events</span>
           </Link>
           <Link to="/rides" className="sidebar-item">
-            <span>🗺️</span> <span>My Rides</span>
+            <span>My Rides</span>
           </Link>
           <Link to="/profile" className="sidebar-item">
-            <span>👤</span> <span>Profile</span>
+            <span>Profile</span>
           </Link>
+          
+          {/* Getting Started Guide */}
+          <div className="sidebar-section">
+            <GettingStartedGuide />
+          </div>
         </aside>
 
         {/* Main */}
         <main className="main-content">
-          <h1>Welcome, {user?.name}! 👋</h1>
+          <h1>Welcome, {user?.name}!</h1>
           <div className="stats-grid">
             <div className="stat-card primary">
               <div className="stat-header">
@@ -261,7 +267,7 @@ const Dashboard = () => {
                   <div className="stat-value">{user?.joinedCommunities?.length || 0}</div>
                   <div className="stat-label">Communities</div>
                 </div>
-                <div className="stat-icon primary">🏘️</div>
+                <div className="stat-icon primary">Communities</div>
               </div>
             </div>
             <div className="stat-card success">
@@ -270,7 +276,7 @@ const Dashboard = () => {
                   <div className="stat-value">{user?.registeredEvents?.length || 0}</div>
                   <div className="stat-label">Events Joined</div>
                 </div>
-                <div className="stat-icon success">📅</div>
+                <div className="stat-icon success">Events</div>
               </div>
             </div>
             <div className="stat-card info">
@@ -279,7 +285,7 @@ const Dashboard = () => {
                   <div className="stat-value">{(user?.registeredEvents?.length || 0) * 2}</div>
                   <div className="stat-label">Total Rides</div>
                 </div>
-                <div className="stat-icon info">🏍️</div>
+                <div className="stat-icon info">Rides</div>
               </div>
             </div>
           </div>
@@ -288,7 +294,7 @@ const Dashboard = () => {
           <div className="create-post">
             <div className="avatar">{user?.name?.[0] || 'R'}</div>
             <textarea 
-              placeholder="Share your ride story... 🏍️" 
+              placeholder="Share your ride story..." 
               rows={3}
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}

@@ -75,7 +75,7 @@ const Blog = () => {
       return;
     }
     if (formData.title.trim().length < 5) {
-      showToast('Title must be at least 5 characters! 📝', 'error');
+      showToast(`Title must be at least 5 characters! (Current: ${formData.title.trim().length}) 📝`, 'error');
       return;
     }
     if (!formData.content.trim()) {
@@ -83,7 +83,7 @@ const Blog = () => {
       return;
     }
     if (formData.content.trim().length < 50) {
-      showToast('Content must be at least 50 characters! 📄', 'error');
+      showToast(`Content must be at least 50 characters! (Current: ${formData.content.trim().length}) 📄`, 'error');
       return;
     }
     if (!formData.categories.trim()) {

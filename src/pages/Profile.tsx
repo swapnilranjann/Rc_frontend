@@ -581,7 +581,7 @@ const Profile = () => {
               fetch('http://localhost:5000/api/auth/me', {
                 headers: { Authorization: `Bearer ${token}` }
               }).then(res => res.json()).then(data => {
-                if (data && data.user) {
+                if (data && data.success && data.user) {
                   localStorage.setItem('user', JSON.stringify(data.user));
                   login(token, data.user);
                 }

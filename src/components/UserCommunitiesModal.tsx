@@ -54,8 +54,14 @@ const UserCommunitiesModal = ({ isOpen, onClose, userId, showToast }: UserCommun
       const userData = await userResponse.json();
       console.log('Raw API response:', userData);
       
-      // Handle both response formats: {user: ...} or {data: ...} or {success: true, user: ...}
-      const user = userData.user || userData.data || userData;
+      // Handle API response format: {success: true, user: ...}
+      const user = userData.user;
+      if (!user) {
+        console.error('No user data in response:', userData);
+        setLoading(false);
+        return;
+      }
+      
       const joinedCommunityIds = user.joinedCommunities || [];
       
       console.log('Extracted user:', user);

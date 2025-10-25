@@ -33,7 +33,17 @@ const FollowersFollowingModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const currentUserId = JSON.parse(localStorage.getItem('user') || '{}')._id;
+  const currentUserId = (() => {
+    try {
+      const userData = localStorage.getItem('user');
+      if (!userData) return null;
+      const user = JSON.parse(userData);
+      return user._id;
+    } catch (error) {
+      console.error('Error parsing user data from localStorage:', error);
+      return null;
+    }
+  })();
 
   useEffect(() => {
     if (isOpen) {
@@ -42,6 +52,12 @@ const FollowersFollowingModal = ({
   }, [isOpen, userId, activeTab]);
 
   const loadData = async () => {
+    if (!userId || !currentUserId) {
+      setError('User not found');
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     setError('');
     
