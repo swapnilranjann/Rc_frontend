@@ -5,6 +5,10 @@ import {
   getAllStates, 
   getCitiesByState
 } from '../data/indiaData';
+import CostCalculator from './CostCalculator';
+import RoutePlanner from './RoutePlanner';
+import RouteMap from './RouteMap';
+import WeatherWidget from './WeatherWidget';
 
 interface CreateEventModalProps {
   onClose: () => void;
@@ -14,6 +18,7 @@ interface CreateEventModalProps {
 
 const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalProps) => {
   const { user } = useContext(AuthContext);
+  const [currentTab, setCurrentTab] = useState<'basic' | 'route' | 'advanced'>('basic');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,6 +34,12 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
     eventType: 'Ride',
     difficulty: 'Easy',
     distance: '',
+  });
+  const [routeData, setRouteData] = useState<any>(null);
+  const [costData, setCostData] = useState<any>(null);
+  const [advancedSettings, setAdvancedSettings] = useState({
+    mileage: 35, // km/liter - default average bike mileage
+    fuelPrice: 105, // ₹/liter - default fuel price
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
@@ -54,40 +65,50 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Only validate ESSENTIAL fields
     if (
       !formData.title ||
       !formData.description ||
       !formData.community ||
       !formData.eventDate ||
-      !formData.startTime ||
-      !formData.endTime ||
-      !formData.locationName ||
-      !formData.locationAddress
+      !formData.locationName
     ) {
-      showToast('Please fill in all required fields', 'error');
+      showToast('Please fill in: Title, Description, Community, Date & Location', 'error');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await eventsAPI.create({
+      const eventData: any = {
         title: formData.title,
         description: formData.description,
         community: formData.community,
         eventDate: formData.eventDate,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
+        startTime: formData.startTime || '09:00', // Default if not provided
+        endTime: formData.endTime || '18:00', // Default if not provided
         location: {
           name: formData.locationName,
-          address: formData.locationAddress,
+          address: formData.locationAddress || formData.locationName, // Use location name if address not provided
         },
-        maxParticipants: parseInt(formData.maxParticipants),
+        maxParticipants: parseInt(formData.maxParticipants) || 50, // Default to 50
         eventType: formData.eventType,
         difficulty: formData.difficulty,
         distance: formData.distance ? parseInt(formData.distance) : undefined,
-      });
+      };
+
+      // Add route details if provided
+      if (routeData) {
+        eventData.routeDetails = routeData;
+      }
+
+      // Add cost estimate if provided
+      if (costData) {
+        eventData.costEstimate = costData;
+      }
+
+      await eventsAPI.create(eventData);
       
-      showToast('Event created successfully! 🎉');
+      showToast('🎉 Event created! Riders can now see and join your ride!', 'success');
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -107,14 +128,46 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
       <div className="modal-content modal-enhanced large" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
-            <h2>📅 Create New Event</h2>
-            <p className="modal-subtitle">Plan an epic ride or meetup with your community</p>
+            <h2>📅 Create New Ride Event</h2>
+            <p className="modal-subtitle">Fill the essentials, we'll handle the rest! Only * fields are required.</p>
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
+
+        {/* Tabs Navigation */}
+        <div className="modal-tabs">
+          <button
+            type="button"
+            className={`tab-btn ${currentTab === 'basic' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('basic')}
+          >
+            <span className="tab-icon">📝</span>
+            <span className="tab-label">Basic Info</span>
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${currentTab === 'route' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('route')}
+          >
+            <span className="tab-icon">🗺️</span>
+            <span className="tab-label">Route & Cost</span>
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${currentTab === 'advanced' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('advanced')}
+          >
+            <span className="tab-icon">⚙️</span>
+            <span className="tab-label">Advanced</span>
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit} className="modal-form">
+          {/* ============ TAB: BASIC INFO ============ */}
+          {currentTab === 'basic' && (
+            <div className="tab-content">
           {/* Event Title */}
           <div className="form-group">
             <label className="form-label">
@@ -126,11 +179,12 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="e.g., Delhi to Manali Highway Ride"
+              placeholder="e.g., Delhi to Manali Weekend Ride"
               className="form-input"
               maxLength={100}
               required
             />
+            <span className="helper-text">💡 Keep it short and catchy!</span>
           </div>
 
           {/* Description */}
@@ -143,12 +197,13 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Describe your event... What makes it special?"
+              placeholder="Tell riders what to expect... Route highlights, stops, experience level needed, etc."
               className="form-input"
               rows={4}
               maxLength={500}
               required
             />
+            <span className="helper-text">💡 Describe the experience, not just the route!</span>
           </div>
 
           {/* Community Selection */}
@@ -196,124 +251,71 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
                 min={new Date().toISOString().split('T')[0]}
                 required
               />
+              <span className="helper-text">💡 When is the ride?</span>
             </div>
 
             <div className="form-group">
               <label className="form-label">
                 <span className="label-icon">🕐</span>
-                Start Time *
+                Start Time <span className="optional-badge">Optional</span>
               </label>
               <input
                 type="time"
                 value={formData.startTime}
                 onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
                 className="form-input"
-                required
+                placeholder="e.g., 07:00"
               />
+              <span className="helper-text">💡 When riders should meet</span>
             </div>
 
             <div className="form-group">
               <label className="form-label">
                 <span className="label-icon">🕐</span>
-                End Time *
+                End Time <span className="optional-badge">Optional</span>
               </label>
               <input
                 type="time"
                 value={formData.endTime}
                 onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                 className="form-input"
-                required
+                placeholder="e.g., 18:00"
               />
+              <span className="helper-text">💡 Expected return time</span>
             </div>
           </div>
 
-          {/* State and City */}
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">🗺️</span>
-                State *
-              </label>
-              <select
-                value={formData.state}
-                onChange={(e) => {
-                  setFormData({ ...formData, state: e.target.value, city: '' });
-                  if (errors.state) setErrors({ ...errors, state: '' });
-                }}
-                className={`form-input ${errors.state ? 'input-error' : ''}`}
-              >
-                <option value="">Select state</option>
-                {states.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📍</span>
-                City *
-              </label>
-              {formData.state ? (
-                <select
-                  value={formData.city}
-                  onChange={(e) => {
-                    setFormData({ ...formData, city: e.target.value });
-                    if (errors.city) setErrors({ ...errors, city: '' });
-                  }}
-                  className={`form-input ${errors.city ? 'input-error' : ''}`}
-                >
-                  <option value="">Select city</option>
-                  {availableCities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  placeholder="Select a state first..."
-                  className="form-input"
-                  disabled
-                />
-              )}
-            </div>
+          {/* Location - Simplified */}
+          <div className="form-group">
+            <label className="form-label">
+              <span className="label-icon">📍</span>
+              Meeting Location *
+            </label>
+            <input
+              type="text"
+              value={formData.locationName}
+              onChange={(e) => setFormData({ ...formData, locationName: e.target.value })}
+              placeholder="e.g., India Gate, New Delhi or Starbucks Connaught Place"
+              className="form-input"
+              required
+            />
+            <span className="helper-text">💡 Where should riders meet? (Include city name)</span>
           </div>
 
-          {/* Location Details */}
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📌</span>
-                Meeting Point *
-              </label>
-              <input
-                type="text"
-                value={formData.locationName}
-                onChange={(e) => setFormData({ ...formData, locationName: e.target.value })}
-                placeholder="e.g., India Gate"
-                className="form-input"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">🗺️</span>
-                Full Address *
-              </label>
-              <input
-                type="text"
-                value={formData.locationAddress}
-                onChange={(e) => setFormData({ ...formData, locationAddress: e.target.value })}
-                placeholder="Complete address with landmarks"
-                className="form-input"
-                required
-              />
-            </div>
+          {/* Optional: Full Address */}
+          <div className="form-group">
+            <label className="form-label">
+              <span className="label-icon">🗺️</span>
+              Detailed Address <span className="optional-badge">Optional</span>
+            </label>
+            <input
+              type="text"
+              value={formData.locationAddress}
+              onChange={(e) => setFormData({ ...formData, locationAddress: e.target.value })}
+              placeholder="Complete address with landmarks (helps riders find the spot)"
+              className="form-input"
+            />
+            <span className="helper-text">💡 Add more details if the location is hard to find</span>
           </div>
 
           {/* Event Details */}
@@ -361,23 +363,23 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
             <div className="form-group">
               <label className="form-label">
                 <span className="label-icon">📏</span>
-                Distance (km)
+                Distance <span className="optional-badge">Optional</span>
               </label>
               <input
                 type="number"
                 value={formData.distance}
                 onChange={(e) => setFormData({ ...formData, distance: e.target.value })}
-                placeholder="Optional"
+                placeholder="e.g., 200"
                 className="form-input"
                 min="0"
               />
-              <span className="helper-text">💡 Total ride distance (optional)</span>
+              <span className="helper-text">💡 Total kilometers (needed for route/cost features)</span>
             </div>
 
             <div className="form-group">
               <label className="form-label">
                 <span className="label-icon">👥</span>
-                Max Participants *
+                Max Riders <span className="optional-badge">Optional</span>
               </label>
               <input
                 type="number"
@@ -385,12 +387,184 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
                 onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
                 className="form-input"
                 min="1"
-                required
+                placeholder="Default: 50"
               />
-              <span className="helper-text">💡 Maximum number of riders</span>
+              <span className="helper-text">💡 Leave blank for unlimited (default: 50)</span>
             </div>
           </div>
+            </div>
+          )}
 
+          {/* ============ TAB: ROUTE & COST ============ */}
+          {currentTab === 'route' && (
+            <div className="tab-content">
+              <div className="route-cost-grid">
+                {/* Route Planner */}
+                <RoutePlanner onRouteChange={(data: any) => setRouteData(data)} />
+                
+                {/* Cost Calculator */}
+                <CostCalculator
+                  distance={parseInt(formData.distance) || 0}
+                  riders={parseInt(formData.maxParticipants) || 1}
+                  defaultMileage={advancedSettings.mileage}
+                  defaultFuelPrice={advancedSettings.fuelPrice}
+                  onChange={(data: any) => setCostData(data)}
+                />
+              </div>
+
+              <div className="tab-helper-card">
+                <div className="helper-icon">💡</div>
+                <div className="helper-content">
+                  <h4>Optional: Add Route & Cost Details</h4>
+                  <p>These features are <strong>completely optional!</strong> Use them if you want to provide extra details to your riders:</p>
+                  <ul className="helper-features">
+                    <li>🗺️ Show route on map (enter start/end locations)</li>
+                    <li>💰 Estimate costs (set distance & fuel details)</li>
+                    <li>🌤️ Check weather forecast (fill date & location)</li>
+                    <li>✨ All calculations happen automatically!</li>
+                  </ul>
+                  <p className="skip-note">
+                    <strong>Skip this tab if you just want to create a simple event!</strong>
+                  </p>
+                </div>
+              </div>
+
+              {/* Map Visualization */}
+              {routeData?.startLocation?.name && routeData?.endLocation?.name && (
+                <RouteMap
+                  startLocation={routeData.startLocation.name}
+                  endLocation={routeData.endLocation.name}
+                  distance={routeData.distance}
+                />
+              )}
+
+              {/* Weather Forecast */}
+              {formData.eventDate && formData.city && (
+                <WeatherWidget
+                  eventDate={formData.eventDate}
+                  location={formData.city}
+                />
+              )}
+            </div>
+          )}
+
+          {/* ============ TAB: ADVANCED ============ */}
+          {currentTab === 'advanced' && (
+            <div className="tab-content">
+              <div className="advanced-settings-card">
+                <div className="settings-header">
+                  <div className="settings-icon">⚙️</div>
+                  <div className="settings-title">
+                    <h3>Advanced Settings</h3>
+                    <p>Configure default values for cost calculations</p>
+                  </div>
+                </div>
+
+                <div className="settings-grid">
+                  {/* Bike Mileage */}
+                  <div className="setting-item">
+                    <label className="setting-label">
+                      <span className="label-icon">🏍️</span>
+                      <span className="label-text">Your Bike's Mileage</span>
+                    </label>
+                    <div className="setting-input-group">
+                      <input
+                        type="number"
+                        value={advancedSettings.mileage}
+                        onChange={(e) => setAdvancedSettings({ 
+                          ...advancedSettings, 
+                          mileage: parseFloat(e.target.value) || 0 
+                        })}
+                        className="setting-input"
+                        min="5"
+                        max="100"
+                        step="0.5"
+                      />
+                      <span className="input-unit">km/L</span>
+                    </div>
+                    <p className="setting-hint">
+                      💡 Your bike's average fuel efficiency (most bikes: 25-50 km/L)
+                    </p>
+                  </div>
+
+                  {/* Fuel Price */}
+                  <div className="setting-item">
+                    <label className="setting-label">
+                      <span className="label-icon">⛽</span>
+                      <span className="label-text">Current Fuel Price</span>
+                    </label>
+                    <div className="setting-input-group">
+                      <span className="input-prefix">₹</span>
+                      <input
+                        type="number"
+                        value={advancedSettings.fuelPrice}
+                        onChange={(e) => setAdvancedSettings({ 
+                          ...advancedSettings, 
+                          fuelPrice: parseFloat(e.target.value) || 0 
+                        })}
+                        className="setting-input with-prefix"
+                        min="50"
+                        max="200"
+                        step="1"
+                      />
+                      <span className="input-unit">per liter</span>
+                    </div>
+                    <p className="setting-hint">
+                      💡 Current petrol price in your area (India avg: ₹100-110)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Preview Card */}
+                <div className="settings-preview">
+                  <div className="preview-header">
+                    <span className="preview-icon">📊</span>
+                    <span className="preview-title">Quick Preview</span>
+                  </div>
+                  <div className="preview-content">
+                    <div className="preview-item">
+                      <span className="preview-label">For a 100 km ride:</span>
+                      <span className="preview-value">
+                        ₹{advancedSettings.mileage > 0 
+                          ? ((100 / advancedSettings.mileage) * advancedSettings.fuelPrice).toFixed(0) 
+                          : '0'} fuel cost
+                      </span>
+                    </div>
+                    <div className="preview-item">
+                      <span className="preview-label">For a 300 km ride:</span>
+                      <span className="preview-value">
+                        ₹{advancedSettings.mileage > 0 
+                          ? ((300 / advancedSettings.mileage) * advancedSettings.fuelPrice).toFixed(0) 
+                          : '0'} fuel cost
+                      </span>
+                    </div>
+                    <div className="preview-item">
+                      <span className="preview-label">For a 500 km ride:</span>
+                      <span className="preview-value">
+                        ₹{advancedSettings.mileage > 0 
+                          ? ((500 / advancedSettings.mileage) * advancedSettings.fuelPrice).toFixed(0) 
+                          : '0'} fuel cost
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info Card */}
+                <div className="settings-info">
+                  <div className="info-item">
+                    <span className="info-emoji">ℹ️</span>
+                    <p>These settings will be used in the <strong>Route & Cost</strong> tab for automatic fuel cost calculations.</p>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-emoji">💡</span>
+                    <p>You can always change these values and the costs will recalculate automatically!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ============ MODAL ACTIONS ============ */}
           <div className="modal-actions">
             <button
               type="button"
@@ -400,6 +574,16 @@ const CreateEventModal = ({ onClose, onSuccess, showToast }: CreateEventModalPro
             >
               Cancel
             </button>
+            {currentTab !== 'advanced' && (
+              <button
+                type="button"
+                className="btn btn-info"
+                onClick={() => setCurrentTab(currentTab === 'basic' ? 'route' : 'advanced')}
+              >
+                <span className="btn-icon">➡️</span>
+                Next: {currentTab === 'basic' ? 'Route & Cost' : 'Advanced'}
+              </button>
+            )}
             <button
               type="submit"
               className="btn btn-primary"

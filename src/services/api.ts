@@ -76,3 +76,39 @@ export const usersAPI = {
   unfollow: (id: string) => api.post(`/users/unfollow/${id}`),
 };
 
+export const followAPI = {
+  follow: (userId: string) => api.post(`/follow/${userId}`),
+  unfollow: (userId: string) => api.delete(`/follow/${userId}`),
+  getFollowers: (userId: string) => api.get(`/follow/followers/${userId}`),
+  getFollowing: (userId: string) => api.get(`/follow/following/${userId}`),
+  getStatus: (userId: string) => api.get(`/follow/status/${userId}`),
+};
+
+export const routesAPI = {
+  getAll: (params?: any) => api.get('/routes', { params }),
+  getById: (id: string) => api.get(`/routes/${id}`),
+  create: (data: any) => api.post('/routes', data),
+  like: (id: string) => api.post(`/routes/${id}/like`),
+  review: (id: string, data: any) => api.post(`/routes/${id}/review`, data)
+};
+
+export const blogAPI = {
+  getAll: (params?: any) => api.get('/blog', { params }),
+  getBySlug: (slug: string) => api.get(`/blog/${slug}`),
+  create: (data: any) => api.post('/blog', data),
+  like: (id: string) => api.post(`/blog/${id}/like`),
+  comment: (id: string, data: any) => api.post(`/blog/${id}/comment`, data)
+};
+
+export const successStoriesAPI = {
+  getAll: (params?: any) => api.get('/success-stories', { params }),
+  getById: (id: string) => api.get(`/success-stories/${id}`),
+  create: (data: any) => api.post('/success-stories', data),
+  like: (id: string) => api.post(`/success-stories/${id}/like`),
+  comment: (id: string, data: any) => api.post(`/success-stories/${id}/comment`, data)
+};
+
+export const contactAPI = {
+  send: (data: any) => api.post('/contact', data),
+  getAll: (params?: any) => api.get('/contact', { params })
+};

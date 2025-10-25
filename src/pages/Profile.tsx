@@ -6,7 +6,7 @@ import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
 import MotorcycleLoader from '../components/ui/MotorcycleLoader';
 import PageTransition from '../components/PageTransition';
-import Footer from '../components/Footer';
+import FollowersFollowingModal from '../components/FollowersFollowingModal';
 import { 
   bikeManufacturers, 
   getAllStates, 
@@ -17,6 +17,7 @@ const Profile = () => {
   const { user, token, isAuthenticated, loading, login } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     state: '',
     city: '',
     bikeType: '',
@@ -26,6 +27,8 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showFollowModal, setShowFollowModal] = useState(false);
+  const [followModalTab, setFollowModalTab] = useState<'followers' | 'following'>('followers');
   const { toasts, showToast, removeToast } = useToast();
 
   const states = getAllStates();
@@ -34,6 +37,7 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       setFormData({
+        name: user.name || '',
         state: '',
         city: user.city || '',
         bikeType: user.bikeType || '',
@@ -147,12 +151,26 @@ const Profile = () => {
                   <div className="stat-number">{user?.registeredEvents?.length || 0}</div>
                   <div className="stat-label">Events</div>
                 </div>
-                <div className="stat-card">
+                <div 
+                  className="stat-card stat-card-clickable" 
+                  onClick={() => {
+                    setFollowModalTab('followers');
+                    setShowFollowModal(true);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="stat-icon">👥</div>
                   <div className="stat-number">{user?.followers?.length || 0}</div>
                   <div className="stat-label">Followers</div>
                 </div>
-                <div className="stat-card">
+                <div 
+                  className="stat-card stat-card-clickable" 
+                  onClick={() => {
+                    setFollowModalTab('following');
+                    setShowFollowModal(true);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="stat-icon">🤝</div>
                   <div className="stat-number">{user?.following?.length || 0}</div>
                   <div className="stat-label">Following</div>
@@ -183,7 +201,6 @@ const Profile = () => {
                     <span className="title-icon">🏍️</span>
                     Bike Information
                   </h2>
-                  <p className="card-subtitle">Your ride details and preferences</p>
                 </div>
                 {!isEditing && (
                   <button 
@@ -199,6 +216,24 @@ const Profile = () => {
               <div className="card-content">
                 {isEditing ? (
                   <div className="edit-form-modern">
+                  {/* Name Input */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-icon">👤</span>
+                      Name
+                      <span className="char-counter">{formData.name.length}/100</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Your name"
+                      className="form-input"
+                      maxLength={100}
+                    />
+                    <span className="helper-text">💡 Your display name across the platform</span>
+                  </div>
+
                   {/* State Dropdown */}
                   <div className="form-group">
                     <label className="form-label">
@@ -472,8 +507,18 @@ const Profile = () => {
         </main>
         </div>
       </div>
+
+      {/* Followers/Following Modal */}
+      <FollowersFollowingModal
+        isOpen={showFollowModal}
+        onClose={() => setShowFollowModal(false)}
+        userId={user?._id || ''}
+        initialTab={followModalTab}
+      />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
-    <Footer />
     </PageTransition>
   );
 };

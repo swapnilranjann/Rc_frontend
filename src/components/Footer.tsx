@@ -1,8 +1,21 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
+  
+  // Quick links with paths
+  const quickLinks = [
+    { path: '/dashboard', icon: '🏠', label: 'Dashboard' },
+    { path: '/communities', icon: '🏘️', label: 'Communities' },
+    { path: '/events', icon: '📅', label: 'Events' },
+    { path: '/rides', icon: '🗺️', label: 'My Rides' },
+    { path: '/profile', icon: '👤', label: 'Profile' },
+  ];
+  
+  // Filter out the current page from quick links
+  const filteredLinks = quickLinks.filter(link => link.path !== location.pathname);
 
   return (
     <footer className="app-footer">
@@ -33,15 +46,20 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Quick Links */}
+        {/* Quick Links - Hide current page */}
         <div className="footer-section">
           <h3 className="footer-title">Quick Links</h3>
           <ul className="footer-links">
-            <li><Link to="/dashboard">🏠 Dashboard</Link></li>
-            <li><Link to="/communities">🏘️ Communities</Link></li>
-            <li><Link to="/events">📅 Events</Link></li>
-            <li><Link to="/rides">🗺️ My Rides</Link></li>
-            <li><Link to="/profile">👤 Profile</Link></li>
+            {filteredLinks.map((link) => (
+              <li key={link.path}>
+                <Link to={link.path}>
+                  {link.icon} {link.label}
+                </Link>
+              </li>
+            ))}
+            {filteredLinks.length === 0 && (
+              <li className="footer-note">✨ You're here!</li>
+            )}
           </ul>
         </div>
 
@@ -49,11 +67,11 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-title">Explore</h3>
           <ul className="footer-links">
-            <li><a href="#popular-routes">🛣️ Popular Routes</a></li>
-            <li><a href="#ride-tips">💡 Ride Tips</a></li>
-            <li><a href="#safety-guide">🦺 Safety Guide</a></li>
-            <li><a href="#bike-maintenance">🔧 Maintenance</a></li>
-            <li><a href="#gear-reviews">🧥 Gear Reviews</a></li>
+            <li><a href="/routes">🛣️ Popular Routes</a></li>
+            <li><a href="/ride-tips">💡 Ride Tips</a></li>
+            <li><a href="/safety">🦺 Safety Guide</a></li>
+            <li><a href="/maintenance">🔧 Maintenance</a></li>
+            <li><a href="/gear">🧥 Gear Reviews</a></li>
           </ul>
         </div>
 
@@ -61,11 +79,11 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-title">Community</h3>
           <ul className="footer-links">
-            <li><a href="#about">ℹ️ About Us</a></li>
-            <li><a href="#blog">📝 Blog</a></li>
-            <li><a href="#success-stories">🌟 Success Stories</a></li>
-            <li><a href="#faq">❓ FAQ</a></li>
-            <li><a href="#contact">📧 Contact</a></li>
+            <li><a href="/about">ℹ️ About Us</a></li>
+            <li><a href="/blog">📝 Blog</a></li>
+            <li><a href="/success-stories">🌟 Success Stories</a></li>
+            <li><a href="/faq">❓ FAQ</a></li>
+            <li><a href="/contact">📧 Contact</a></li>
           </ul>
         </div>
 

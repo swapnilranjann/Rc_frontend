@@ -227,6 +227,72 @@ const Events = () => {
                     )}
                   </div>
 
+                  {/* Route & Cost Info (World-Class!) */}
+                  {(event.routeDetails || event.costEstimate) && (
+                    <div className="event-advanced-info">
+                      {event.routeDetails && (
+                        <div className="route-info-compact">
+                          <div className="route-header">
+                            <span className="route-icon">🗺️</span>
+                            <span className="route-label">Route Info</span>
+                          </div>
+                          <div className="route-details-compact">
+                            {event.routeDetails.startLocation?.name && (
+                              <div className="route-point">
+                                <span className="point-icon">🚩</span>
+                                <span className="point-name">{event.routeDetails.startLocation.name}</span>
+                              </div>
+                            )}
+                            {event.routeDetails.endLocation?.name && (
+                              <div className="route-point">
+                                <span className="point-icon">🏁</span>
+                                <span className="point-name">{event.routeDetails.endLocation.name}</span>
+                              </div>
+                            )}
+                            {event.routeDetails.routeType && (
+                              <div className="route-meta">
+                                <span className="meta-badge">
+                                  {event.routeDetails.routeType === 'highway' && '🛣️ Highway'}
+                                  {event.routeDetails.routeType === 'scenic' && '🌄 Scenic'}
+                                  {event.routeDetails.routeType === 'mountain' && '⛰️ Mountain'}
+                                  {event.routeDetails.routeType === 'coastal' && '🌊 Coastal'}
+                                  {event.routeDetails.routeType === 'mixed' && '🗺️ Mixed'}
+                                </span>
+                                {event.routeDetails.estimatedDuration && (
+                                  <span className="meta-badge">
+                                    ⏱️ {event.routeDetails.estimatedDuration.hours}h {event.routeDetails.estimatedDuration.minutes}m
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {event.costEstimate && (
+                        <div className="cost-info-compact">
+                          <div className="cost-header">
+                            <span className="cost-icon">💰</span>
+                            <span className="cost-label">Est. Cost</span>
+                          </div>
+                          <div className="cost-details-compact">
+                            <div className="cost-main">
+                              <span className="cost-amount">₹{event.costEstimate.totalPerPerson?.toFixed(0) || '0'}</span>
+                              <span className="cost-per">per person</span>
+                            </div>
+                            {event.costEstimate.fuelCost?.total > 0 && (
+                              <div className="cost-breakdown">
+                                <span className="breakdown-item">⛽ ₹{event.costEstimate.fuelCost.total.toFixed(0)}</span>
+                                {event.costEstimate.tollCharges?.amount > 0 && (
+                                  <span className="breakdown-item">🛣️ ₹{(event.costEstimate.tollCharges.amount * event.costEstimate.tollCharges.numberOfTolls).toFixed(0)}</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="event-participants">
                     <span className="participants-count">
                       👥 {event.currentParticipants}/{event.maxParticipants} registered
