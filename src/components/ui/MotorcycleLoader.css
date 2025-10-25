@@ -1,0 +1,221 @@
+/* Motorcycle Loader Styles */
+.motorcycle-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 200px;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+.motorcycle-loader-container.small {
+  min-height: 100px;
+  padding: 1rem;
+}
+
+.motorcycle-loader-container.large {
+  min-height: 400px;
+  padding: 4rem;
+}
+
+.motorcycle-loader {
+  position: relative;
+  width: 200px;
+  height: 100px;
+}
+
+.motorcycle-loader-container.small .motorcycle-loader {
+  width: 100px;
+  height: 50px;
+}
+
+.motorcycle-loader-container.large .motorcycle-loader {
+  width: 300px;
+  height: 150px;
+}
+
+.motorcycle-loader .bike {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  font-size: 4rem;
+  animation: rideMotorcycle 2s ease-in-out infinite;
+  z-index: 2;
+  filter: drop-shadow(0 4px 20px rgba(255, 77, 0, 0.6));
+}
+
+.motorcycle-loader-container.small .bike {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 15px rgba(255, 77, 0, 0.5));
+}
+
+.motorcycle-loader-container.large .bike {
+  font-size: 6rem;
+  filter: drop-shadow(0 6px 30px rgba(255, 77, 0, 0.8));
+}
+
+@keyframes rideMotorcycle {
+  0%, 100% {
+    left: 0;
+  }
+  50% {
+    left: calc(100% - 60px);
+  }
+}
+
+.road {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.road .line {
+  position: absolute;
+  height: 100%;
+  width: 40px;
+  background: var(--primary);
+  animation: roadLine 1.5s linear infinite;
+}
+
+.road .line:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.road .line:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.road .line:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes roadLine {
+  0% {
+    left: -40px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.loader-text {
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(255, 77, 0, 0.5);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+[data-theme="light"] .loader-text {
+  color: var(--primary);
+  text-shadow: 0 2px 10px rgba(255, 77, 0, 0.3);
+}
+
+[data-theme="dark"] .loader-text {
+  color: var(--primary);
+  text-shadow: 0 2px 15px rgba(255, 87, 34, 0.6);
+}
+
+.motorcycle-loader-container.small .loader-text {
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.motorcycle-loader-container.large .loader-text {
+  font-size: 1.25rem;
+  margin-top: 3rem;
+  font-weight: 700;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Full Page Loader */
+.full-page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  backdrop-filter: blur(20px) brightness(0.8);
+  -webkit-backdrop-filter: blur(20px) brightness(0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Light mode - blur with brightness */
+[data-theme="light"] .full-page-loader {
+  backdrop-filter: blur(20px) brightness(1.1) saturate(0.8);
+  -webkit-backdrop-filter: blur(20px) brightness(1.1) saturate(0.8);
+}
+
+/* Dark mode - blur with darker tone */
+[data-theme="dark"] .full-page-loader {
+  backdrop-filter: blur(20px) brightness(0.6) saturate(0.8);
+  -webkit-backdrop-filter: blur(20px) brightness(0.6) saturate(0.8);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Navigation Loader (Route Transitions) */
+.navigation-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  backdrop-filter: blur(15px) brightness(0.85);
+  -webkit-backdrop-filter: blur(15px) brightness(0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+  pointer-events: all;
+}
+
+[data-theme="light"] .navigation-loader {
+  backdrop-filter: blur(15px) brightness(1.05) saturate(0.9);
+  -webkit-backdrop-filter: blur(15px) brightness(1.05) saturate(0.9);
+}
+
+[data-theme="dark"] .navigation-loader {
+  backdrop-filter: blur(15px) brightness(0.65) saturate(0.9);
+  -webkit-backdrop-filter: blur(15px) brightness(0.65) saturate(0.9);
+}
+
