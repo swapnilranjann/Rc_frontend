@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 
 const faqData = [
@@ -100,6 +101,9 @@ const FAQ = () => {
     <PageTransition>
       <div className="page-container">
         <div className="faq-page">
+          <Link to="/dashboard" className="back-to-dashboard">
+            ← Back to Dashboard
+          </Link>
           <div className="faq-header">
             <h1>❓ Frequently Asked Questions</h1>
             <p>Find answers to common questions about RiderConnect</p>

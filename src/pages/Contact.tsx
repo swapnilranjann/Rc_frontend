@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { contactAPI } from '../services/api';
 import PageTransition from '../components/PageTransition';
 import { useToast } from '../hooks/useToast';
@@ -24,6 +24,35 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate required fields
+    if (!formData.name.trim()) {
+      showToast('Name is required! 👤', 'error');
+      return;
+    }
+    if (!formData.email.trim()) {
+      showToast('Email is required! 📧', 'error');
+      return;
+    }
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showToast('Please enter a valid email address! 📧', 'error');
+      return;
+    }
+    if (!formData.subject.trim()) {
+      showToast('Subject is required! 📝', 'error');
+      return;
+    }
+    if (!formData.message.trim()) {
+      showToast('Message is required! 💬', 'error');
+      return;
+    }
+    if (formData.message.trim().length < 10) {
+      showToast('Message must be at least 10 characters! 💬', 'error');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -49,6 +78,9 @@ const Contact = () => {
     <PageTransition>
       <div className="page-container">
         <div className="contact-page">
+          <Link to="/dashboard" className="back-to-dashboard">
+            ← Back to Dashboard
+          </Link>
           <div className="contact-header">
             <h1>📧 Get In Touch</h1>
             <p>Have questions? We'd love to hear from you!</p>

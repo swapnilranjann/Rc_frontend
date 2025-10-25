@@ -65,6 +65,22 @@ const Communities = () => {
     try {
       await communitiesAPI.join(communityId);
       showToast('Joined community! 🎉');
+      
+      // Refresh user data to update joinedCommunities
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userResponse = await fetch('http://localhost:5000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          // Update localStorage and trigger context refresh
+          localStorage.setItem('user', JSON.stringify(userData.user));
+          // Force page reload to update context
+          window.location.reload();
+        }
+      }
+      
       loadCommunities();
     } catch (error: any) {
       showToast(error.response?.data?.message || 'Failed to join', 'error');
@@ -75,6 +91,22 @@ const Communities = () => {
     try {
       await communitiesAPI.leave(communityId);
       showToast('Left community');
+      
+      // Refresh user data to update joinedCommunities
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userResponse = await fetch('http://localhost:5000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          // Update localStorage and trigger context refresh
+          localStorage.setItem('user', JSON.stringify(userData.user));
+          // Force page reload to update context
+          window.location.reload();
+        }
+      }
+      
       loadCommunities();
     } catch (error: any) {
       showToast(error.response?.data?.message || 'Failed to leave', 'error');
@@ -82,7 +114,11 @@ const Communities = () => {
   };
 
   const isJoined = (communityId: string) => {
-    return user?.joinedCommunities?.includes(communityId);
+    if (!user?.joinedCommunities) return false;
+    return user.joinedCommunities.some((id: any) => {
+      const idStr = typeof id === 'string' ? id : id._id || id.toString();
+      return idStr === communityId;
+    });
   };
 
   if (loading) {
@@ -170,7 +206,7 @@ const Communities = () => {
         ) : (
           <div className="communities-grid">
             {filteredCommunities.map((community) => (
-              <div key={community._id} className="community-card">
+              <div key={community._id} className={`community-card ${isJoined(community._id) ? 'community-joined' : ''}`}>
                 <div className="community-header">
                   <div className="community-icon">🏍️</div>
                   <div className="community-badges">
@@ -178,6 +214,9 @@ const Communities = () => {
                       <span className="badge badge-public">Public</span>
                     ) : (
                       <span className="badge badge-private">Private</span>
+                    )}
+                    {isJoined(community._id) && (
+                      <span className="joined-badge">✓ Joined</span>
                     )}
                   </div>
                 </div>
@@ -200,17 +239,17 @@ const Communities = () => {
                 <div className="community-footer">
                   {isJoined(community._id) ? (
                     <button
-                      className="btn btn-secondary btn-block"
+                      className="btn btn-secondary btn-block btn-leave"
                       onClick={() => leaveCommunity(community._id)}
                     >
-                      ✓ Joined
+                      🚪 Leave Community
                     </button>
                   ) : (
                     <button
-                      className="btn btn-primary btn-block"
+                      className="btn btn-primary btn-block btn-join"
                       onClick={() => joinCommunity(community._id)}
                     >
-                      Join Community
+                      ➕ Join Community
                     </button>
                   )}
                 </div>

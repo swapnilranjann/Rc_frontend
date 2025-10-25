@@ -25,7 +25,7 @@
 /* Header */
 .calculator-header {
   padding: 2rem;
-  background: linear-gradient(135deg, #ff9900, #ff6b35);
+  background: var(--gradient-primary);
   color: white;
   text-align: center;
 }
@@ -74,8 +74,8 @@
 }
 
 .cost-section:hover {
-  border-color: rgba(255, 153, 0, 0.3);
-  box-shadow: 0 4px 16px rgba(255, 153, 0, 0.1);
+  border-color: rgba(var(--primary-rgb), 0.3);
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.1);
   transform: translateY(-2px);
 }
 
@@ -88,7 +88,7 @@
 
 .section-icon {
   font-size: 1.75rem;
-  filter: drop-shadow(0 2px 4px rgba(255, 153, 0, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(var(--primary-rgb), 0.3));
 }
 
 .section-header h4 {
@@ -174,8 +174,8 @@
 
 .calc-input-group input:focus {
   outline: none;
-  border-color: #ff9900;
-  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
   transform: scale(1.02);
 }
 
@@ -191,9 +191,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: rgba(255, 153, 0, 0.05);
+  background: rgba(var(--primary-rgb), 0.05);
   border-radius: 12px;
-  border: 1px solid rgba(255, 153, 0, 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
   margin-top: 1rem;
 }
 
@@ -216,16 +216,16 @@
 }
 
 .summary-value.primary {
-  color: #ff9900;
+  color: var(--primary-color);
 }
 
 /* Total Summary Card */
 .cost-summary-card {
   padding: 2rem;
-  background: linear-gradient(135deg, rgba(255, 153, 0, 0.1), rgba(255, 107, 53, 0.1));
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--primary-rgb), 0.1));
   border-radius: 20px;
-  border: 2px solid rgba(255, 153, 0, 0.2);
-  box-shadow: 0 8px 24px rgba(255, 153, 0, 0.15);
+  border: 2px solid rgba(var(--primary-rgb), 0.2);
+  box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.15);
 }
 
 .summary-row {
@@ -244,13 +244,13 @@
 .summary-amount {
   font-size: 2rem;
   font-weight: 800;
-  color: #ff9900;
-  text-shadow: 0 2px 4px rgba(255, 153, 0, 0.2);
+  color: var(--primary-color);
+  text-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
 }
 
 .summary-divider {
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 153, 0, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.3), transparent);
   margin: 1.5rem 0;
 }
 
@@ -280,7 +280,7 @@
 .per-person-amount {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #ff9900;
+  color: var(--primary-color);
 }
 
 /* Breakdown */

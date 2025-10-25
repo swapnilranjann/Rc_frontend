@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthContextType } from '../types';
+import { applyTheme, getStoredTheme } from '../config/themeColors';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -20,9 +21,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (storedToken && storedUser && storedUser !== 'undefined') {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setToken(storedToken);
+        setUser(parsedUser);
+        // Apply user's saved theme color
+        if (parsedUser.themeColor) {
+          applyTheme(parsedUser.themeColor);
+        } else {
+          // Fallback to stored theme or default
+          applyTheme(getStoredTheme());
+        }
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+        // Clear invalid data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Apply default theme
+        applyTheme('blue');
+      }
+    } else {
+      // Apply default theme for non-authenticated users
+      applyTheme(getStoredTheme());
     }
     setLoading(false);
   }, []);
@@ -32,6 +53,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('user', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
+    // Apply user's theme color
+    if (newUser.themeColor) {
+      applyTheme(newUser.themeColor);
+    }
   };
 
   const logout = () => {

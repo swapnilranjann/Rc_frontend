@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Favicon Generator</title>
+</head>
+<body>
+    <script>
+        // This script generates a dynamic favicon that matches the theme color
+        function generateFavicon(primaryColor = '#3b82f6') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            // Background circle
+            ctx.fillStyle = primaryColor;
+            ctx.beginPath();
+            ctx.arc(32, 32, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // White motorcycle silhouette
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🏍️', 32, 32);
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Set initial favicon
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/png';
+        link.rel = 'icon';
+        link.href = generateFavicon();
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</body>
+</html>
+

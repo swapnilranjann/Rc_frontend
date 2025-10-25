@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 
 const tips = [
@@ -16,6 +17,9 @@ const RideTips = () => {
     <PageTransition>
       <div className="page-container">
         <div className="tips-page">
+          <Link to="/dashboard" className="back-to-dashboard">
+            ← Back to Dashboard
+          </Link>
           <div className="tips-header">
             <h1>💡 Ride Tips</h1>
             <p>Essential tips for every rider</p>

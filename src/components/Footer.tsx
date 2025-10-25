@@ -1,9 +1,29 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { statsAPI } from '../services/api';
 import './Footer.css';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalCommunities: 0,
+    completedRides: 0,
+    totalCities: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await statsAPI.getStats();
+        setStats(response.data.stats);
+      } catch (error) {
+        console.error('Failed to fetch footer stats:', error);
+      }
+    };
+    fetchStats();
+  }, []);
   
   // Quick links with paths
   const quickLinks = [
@@ -32,15 +52,15 @@ const Footer = () => {
           </p>
           <div className="footer-stats">
             <div className="footer-stat">
-              <span className="stat-number">10,000+</span>
+              <span className="stat-number">{stats.totalUsers.toLocaleString()}+</span>
               <span className="stat-label">Riders</span>
             </div>
             <div className="footer-stat">
-              <span className="stat-number">500+</span>
+              <span className="stat-number">{stats.totalCommunities}+</span>
               <span className="stat-label">Communities</span>
             </div>
             <div className="footer-stat">
-              <span className="stat-number">1,200+</span>
+              <span className="stat-number">{stats.completedRides.toLocaleString()}+</span>
               <span className="stat-label">Rides</span>
             </div>
           </div>
@@ -53,12 +73,12 @@ const Footer = () => {
             {filteredLinks.map((link) => (
               <li key={link.path}>
                 <Link to={link.path}>
-                  {link.icon} {link.label}
+                  {link.label}
                 </Link>
               </li>
             ))}
             {filteredLinks.length === 0 && (
-              <li className="footer-note">✨ You're here!</li>
+              <li className="footer-note">You're here!</li>
             )}
           </ul>
         </div>
@@ -67,11 +87,11 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-title">Explore</h3>
           <ul className="footer-links">
-            <li><a href="/routes">🛣️ Popular Routes</a></li>
-            <li><a href="/ride-tips">💡 Ride Tips</a></li>
-            <li><a href="/safety">🦺 Safety Guide</a></li>
-            <li><a href="/maintenance">🔧 Maintenance</a></li>
-            <li><a href="/gear">🧥 Gear Reviews</a></li>
+            <li><a href="/routes">Popular Routes</a></li>
+            <li><a href="/ride-tips">Ride Tips</a></li>
+            <li><a href="/safety">Safety Guide</a></li>
+            <li><a href="/maintenance">Maintenance</a></li>
+            <li><a href="/gear">Gear Reviews</a></li>
           </ul>
         </div>
 
@@ -79,11 +99,11 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-title">Community</h3>
           <ul className="footer-links">
-            <li><a href="/about">ℹ️ About Us</a></li>
-            <li><a href="/blog">📝 Blog</a></li>
-            <li><a href="/success-stories">🌟 Success Stories</a></li>
-            <li><a href="/faq">❓ FAQ</a></li>
-            <li><a href="/contact">📧 Contact</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/success-stories">Success Stories</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/contact">Contact</a></li>
           </ul>
         </div>
 
@@ -118,7 +138,7 @@ const Footer = () => {
             </a>
           </div>
           <div className="footer-newsletter">
-            <h4 className="newsletter-title">📬 Newsletter</h4>
+            <h4 className="newsletter-title">Newsletter</h4>
             <p className="newsletter-text">Get ride updates & tips</p>
             <div className="newsletter-form">
               <input 
@@ -139,7 +159,7 @@ const Footer = () => {
       <div className="footer-bottom">
         <div className="footer-bottom-container">
           <div className="footer-copyright">
-            <p>© {currentYear} RiderConnect. All rights reserved. Made with ❤️ for riders</p>
+            <p>© {currentYear} RiderConnect. All rights reserved. Made with ❤️ in India 🇮🇳 for riders</p>
           </div>
           <div className="footer-legal">
             <a href="#privacy">Privacy Policy</a>
@@ -151,7 +171,6 @@ const Footer = () => {
             <a href="#sitemap">Sitemap</a>
           </div>
           <div className="footer-badge">
-            <span className="badge-icon">🏍️</span>
             <span className="badge-text">Ride Safe, Ride Together</span>
           </div>
         </div>

@@ -119,6 +119,23 @@ const CreateCommunityModal = ({ onClose, onSuccess, showToast }: CreateCommunity
       });
       
       showToast('Community created successfully! 🎉');
+      
+      // Refresh user data to update joinedCommunities (creator is auto-added as member)
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userResponse = await fetch('http://localhost:5000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          localStorage.setItem('user', JSON.stringify(userData.user));
+          // Reload page to refresh context after showing toast
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      }
+      
       onSuccess();
       onClose();
     } catch (error: any) {

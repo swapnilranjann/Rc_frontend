@@ -1,10 +1,29 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import DevAuthButton from '../components/DevAuthButton';
+import { statsAPI } from '../services/api';
 
 const Home = () => {
   const { isAuthenticated, loading } = useContext(AuthContext);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalCommunities: 0,
+    completedRides: 0,
+    totalCities: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await statsAPI.getStats();
+        setStats(response.data.stats);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+    fetchStats();
+  }, []);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -40,7 +59,7 @@ const Home = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1>
-              Connect with <span className="highlight">10,000+ Riders</span> Across India
+              Connect with <span className="highlight">{stats.totalUsers.toLocaleString()}+ Riders</span> Across India
             </h1>
             <p>
               Join the fastest-growing motorcycle community. Find riding buddies, discover epic
@@ -65,19 +84,19 @@ const Home = () => {
       <div className="stats">
         <div className="stats-grid">
           <div className="stat-item">
-            <div className="stat-number">10,000+</div>
+            <div className="stat-number">{stats.totalUsers.toLocaleString()}+</div>
             <div className="stat-label">Active Riders</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">500+</div>
+            <div className="stat-number">{stats.totalCommunities.toLocaleString()}+</div>
             <div className="stat-label">Communities</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">1,200+</div>
+            <div className="stat-number">{stats.completedRides.toLocaleString()}+</div>
             <div className="stat-label">Rides Organized</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">50+</div>
+            <div className="stat-number">{stats.totalCities}+</div>
             <div className="stat-label">Cities</div>
           </div>
         </div>

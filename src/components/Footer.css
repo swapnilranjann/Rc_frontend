@@ -19,7 +19,8 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 153, 0, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  opacity: 0.1;
   animation: shimmer 3s infinite;
 }
 
@@ -65,7 +66,7 @@
 .footer-logo-text {
   font-size: 1.75rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ff9900, #ffcc00);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -194,9 +195,9 @@
 }
 
 .social-link:hover {
-  background: var(--primary-color);
+  background: var(--gradient-primary);
   transform: translateY(-5px) rotate(360deg);
-  box-shadow: 0 5px 20px rgba(255, 153, 0, 0.4);
+  box-shadow: 0 5px 20px var(--primary-color);
 }
 
 .social-link svg {
@@ -247,25 +248,27 @@
   outline: none;
   border-color: var(--primary-color);
   background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+  box-shadow: 0 0 0 3px var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color), 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 .newsletter-btn {
   padding: 0.75rem 1.25rem;
-  background: var(--primary-color);
+  background: var(--gradient-primary);
   border: none;
   border-radius: 8px;
-  color: #000000;
+  color: #ffffff;
   font-size: 1.2rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--primary-color);
 }
 
 .newsletter-btn:hover {
-  background: #ffaa00;
-  transform: translateX(5px);
-  box-shadow: 0 5px 20px rgba(255, 153, 0, 0.4);
+  background: var(--primary-dark);
+  transform: translateX(5px) scale(1.05);
+  box-shadow: 0 5px 20px var(--primary-color);
 }
 
 /* Bottom Bar */
@@ -321,9 +324,11 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: rgba(255, 153, 0, 0.1);
+  background: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   border-radius: 50px;
-  border: 1px solid rgba(255, 153, 0, 0.3);
+  border: 1px solid var(--primary-light);
+  opacity: 0.2;
 }
 
 .badge-icon {

@@ -1,10 +1,35 @@
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import PageTransition from '../components/PageTransition';
+import { statsAPI } from '../services/api';
 
 const AboutUs = () => {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalCommunities: 0,
+    completedRides: 0,
+    totalCities: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await statsAPI.getStats();
+        setStats(response.data.stats);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <PageTransition>
       <div className="page-container">
         <div className="about-page">
+          <Link to="/dashboard" className="back-to-dashboard">
+            ← Back to Dashboard
+          </Link>
           <div className="about-hero">
             <h1>🏍️ About RiderConnect</h1>
             <p className="tagline">Connecting Riders. Creating Memories. Building Community.</p>
@@ -15,7 +40,7 @@ const AboutUs = () => {
             <p>
               Founded in 2024, RiderConnect was born from a simple idea: every rider deserves a community. 
               What started as a small group of motorcycle enthusiasts in Delhi has grown into India's 
-              fastest-growing rider community platform, connecting over 10,000 riders across 50+ cities.
+              fastest-growing rider community platform, connecting over {stats.totalUsers.toLocaleString()} riders across {stats.totalCities}+ cities.
             </p>
             <p>
               We believe in the freedom of the open road, the thrill of discovery, and the bonds formed 
@@ -48,8 +73,8 @@ const AboutUs = () => {
           <section className="about-section">
             <h2>What We Offer</h2>
             <ul className="features-list">
-              <li>🏘️ <strong>500+ Communities</strong> - Find your tribe based on location, bike type, or interests</li>
-              <li>📅 <strong>1,200+ Rides</strong> - Join organized rides from day trips to multi-day adventures</li>
+              <li>🏘️ <strong>{stats.totalCommunities}+ Communities</strong> - Find your tribe based on location, bike type, or interests</li>
+              <li>📅 <strong>{stats.completedRides}+ Rides</strong> - Join organized rides from day trips to multi-day adventures</li>
               <li>🗺️ <strong>Route Planning</strong> - Advanced tools for planning perfect rides with cost estimates</li>
               <li>💬 <strong>Connect & Share</strong> - Share experiences, tips, and photos with fellow riders</li>
               <li>🌟 <strong>Success Stories</strong> - Get inspired by real rider journeys and achievements</li>
@@ -83,19 +108,19 @@ const AboutUs = () => {
             <h2>By The Numbers</h2>
             <div className="stats-grid">
               <div className="stat-box">
-                <span className="stat-number">10,000+</span>
+                <span className="stat-number">{stats.totalUsers.toLocaleString()}+</span>
                 <span className="stat-label">Active Riders</span>
               </div>
               <div className="stat-box">
-                <span className="stat-number">500+</span>
+                <span className="stat-number">{stats.totalCommunities}+</span>
                 <span className="stat-label">Communities</span>
               </div>
               <div className="stat-box">
-                <span className="stat-number">1,200+</span>
+                <span className="stat-number">{stats.completedRides.toLocaleString()}+</span>
                 <span className="stat-label">Rides Organized</span>
               </div>
               <div className="stat-box">
-                <span className="stat-number">50+</span>
+                <span className="stat-number">{stats.totalCities}+</span>
                 <span className="stat-label">Cities</span>
               </div>
             </div>

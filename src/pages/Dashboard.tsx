@@ -71,7 +71,16 @@ const Dashboard = () => {
   };
 
   const handleCreatePost = async () => {
-    if (!postContent.trim()) return;
+    // Validate post content
+    if (!postContent.trim()) {
+      showToast('Post content cannot be empty! 📝', 'error');
+      return;
+    }
+
+    if (postContent.trim().length < 3) {
+      showToast('Post must be at least 3 characters! 📝', 'error');
+      return;
+    }
     
     // Get user's first community
     const firstCommunity = user?.joinedCommunities?.[0];
@@ -84,7 +93,7 @@ const Dashboard = () => {
     }
     
     if (!communityId) {
-      showToast('Please join a community first!', 'error');
+      showToast('Please join a community first! 🏘️', 'error');
       return;
     }
 
@@ -132,7 +141,16 @@ const Dashboard = () => {
 
   const handleCommentSubmit = async (postId: string) => {
     const text = commentText[postId]?.trim();
-    if (!text) return;
+    
+    if (!text) {
+      showToast('Comment cannot be empty! 💬', 'error');
+      return;
+    }
+
+    if (text.length < 2) {
+      showToast('Comment must be at least 2 characters! 💬', 'error');
+      return;
+    }
 
     setSubmittingComment(prev => ({ ...prev, [postId]: true }));
     try {

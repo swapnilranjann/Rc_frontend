@@ -112,3 +112,14 @@ export const contactAPI = {
   send: (data: any) => api.post('/contact', data),
   getAll: (params?: any) => api.get('/contact', { params })
 };
+
+export const statsAPI = {
+  getStats: () => api.get('/stats')
+};
+
+export const gearReviewsAPI = {
+  getAll: (type?: string) => api.get('/gear-reviews', { params: { type } }),
+  create: (data: any) => api.post('/gear-reviews', data),
+  like: (id: string) => api.post(`/gear-reviews/${id}/like`),
+  comment: (id: string, data: { text: string }) => api.post(`/gear-reviews/${id}/comment`, data)
+};

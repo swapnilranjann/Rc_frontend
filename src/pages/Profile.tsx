@@ -7,11 +7,14 @@ import ToastContainer from '../components/ToastContainer';
 import MotorcycleLoader from '../components/ui/MotorcycleLoader';
 import PageTransition from '../components/PageTransition';
 import FollowersFollowingModal from '../components/FollowersFollowingModal';
+import UserCommunitiesModal from '../components/UserCommunitiesModal';
+import '../components/UserCommunitiesModal.css';
 import { 
   bikeManufacturers, 
   getAllStates, 
   getCitiesByState
 } from '../data/indiaData';
+import { themeColors, applyTheme } from '../config/themeColors';
 
 const Profile = () => {
   const { user, token, isAuthenticated, loading, login } = useContext(AuthContext);
@@ -22,13 +25,15 @@ const Profile = () => {
     city: '',
     bikeType: '',
     bikeModel: '',
-    bio: ''
+    bio: '',
+    themeColor: 'blue'
   });
   const [isSaving, setIsSaving] = useState(false);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showFollowModal, setShowFollowModal] = useState(false);
   const [followModalTab, setFollowModalTab] = useState<'followers' | 'following'>('followers');
+  const [showCommunitiesModal, setShowCommunitiesModal] = useState(false);
   const { toasts, showToast, removeToast } = useToast();
 
   const states = getAllStates();
@@ -42,8 +47,13 @@ const Profile = () => {
         city: user.city || '',
         bikeType: user.bikeType || '',
         bikeModel: user.bikeModel || '',
-        bio: user.bio || ''
+        bio: user.bio || '',
+        themeColor: user.themeColor || 'blue'
       });
+      // Apply user's saved theme
+      if (user.themeColor) {
+        applyTheme(user.themeColor);
+      }
     }
   }, [user]);
 
@@ -61,6 +71,11 @@ const Profile = () => {
     }
   }, [formData.state, formData.city]);
 
+  const handleThemeChange = (themeId: string) => {
+    setFormData({ ...formData, themeColor: themeId });
+    applyTheme(themeId);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -71,6 +86,8 @@ const Profile = () => {
       if (token) {
         login(token, response.data.user);
       }
+      // Apply the saved theme
+      applyTheme(formData.themeColor);
       showToast('Profile updated successfully! 🎉');
       setIsEditing(false);
     } catch (error: any) {
@@ -141,7 +158,11 @@ const Profile = () => {
 
               {/* Stats Grid */}
               <div className="profile-stats-grid">
-                <div className="stat-card">
+                <div 
+                  className="stat-card stat-card-clickable"
+                  onClick={() => setShowCommunitiesModal(true)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="stat-icon">🏘️</div>
                   <div className="stat-number">{user?.joinedCommunities?.length || 0}</div>
                   <div className="stat-label">Communities</div>
@@ -180,13 +201,39 @@ const Profile = () => {
               {/* Quick Actions */}
               <div className="profile-quick-actions">
                 <Link to="/communities" className="quick-action-btn">
-                  <span className="action-icon">🏘️</span>
                   My Communities
                 </Link>
                 <Link to="/rides" className="quick-action-btn">
-                  <span className="action-icon">🗺️</span>
                   My Rides
                 </Link>
+              </div>
+
+              {/* Theme Color Picker - Always Visible */}
+              <div className="theme-picker-card">
+                <div className="theme-picker-header">
+                  <h3>Theme Color</h3>
+                  <p className="theme-picker-subtitle">Personalize your experience</p>
+                </div>
+                <div className="theme-colors-grid-compact">
+                  {themeColors.map((theme) => (
+                    <div
+                      key={theme.id}
+                      className={`theme-color-option-compact ${formData.themeColor === theme.id ? 'active' : ''}`}
+                      onClick={() => handleThemeChange(theme.id)}
+                      style={{
+                        background: theme.gradient
+                      }}
+                      title={theme.name}
+                    >
+                      {formData.themeColor === theme.id && (
+                        <span className="theme-check-compact">✓</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="theme-picker-note">
+                  Changes apply instantly across all pages
+                </p>
               </div>
             </div>
           </aside>
@@ -197,17 +244,13 @@ const Profile = () => {
             <div className="info-card">
               <div className="card-header-modern">
                 <div className="card-title-section">
-                  <h2 className="card-title">
-                    <span className="title-icon">🏍️</span>
-                    Bike Information
-                  </h2>
+                  <h2 className="card-title">Bike Information</h2>
                 </div>
                 {!isEditing && (
                   <button 
                     className="btn btn-edit"
                     onClick={() => setIsEditing(true)}
                   >
-                    <span className="btn-icon">✏️</span>
                     Edit Profile
                   </button>
                 )}
@@ -219,7 +262,6 @@ const Profile = () => {
                   {/* Name Input */}
                   <div className="form-group">
                     <label className="form-label">
-                      <span className="label-icon">👤</span>
                       Name
                       <span className="char-counter">{formData.name.length}/100</span>
                     </label>
@@ -236,10 +278,7 @@ const Profile = () => {
 
                   {/* State Dropdown */}
                   <div className="form-group">
-                    <label className="form-label">
-                      <span className="label-icon">🗺️</span>
-                      State
-                    </label>
+                    <label className="form-label">State</label>
                     <select
                       value={formData.state}
                       onChange={(e) => {
@@ -260,10 +299,7 @@ const Profile = () => {
 
                   {/* City Dropdown */}
                   <div className="form-group">
-                    <label className="form-label">
-                      <span className="label-icon">📍</span>
-                      City
-                    </label>
+                    <label className="form-label">City</label>
                     {formData.state ? (
                       <>
                         <select
@@ -300,10 +336,7 @@ const Profile = () => {
 
                   {/* Bike Type with Groups */}
                   <div className="form-group">
-                    <label className="form-label">
-                      <span className="label-icon">🏍️</span>
-                      Bike Type
-                    </label>
+                    <label className="form-label">Bike Type</label>
                     <select
                       value={formData.bikeType}
                       onChange={(e) => {
@@ -354,10 +387,7 @@ const Profile = () => {
 
                   {/* Bike Model */}
                   <div className="form-group">
-                    <label className="form-label">
-                      <span className="label-icon">🔧</span>
-                      Bike Model
-                    </label>
+                    <label className="form-label">Bike Model</label>
                     <input
                       type="text"
                       value={formData.bikeModel}
@@ -372,7 +402,6 @@ const Profile = () => {
                   {/* Bio */}
                   <div className="form-group">
                     <label className="form-label">
-                      <span className="label-icon">📝</span>
                       Bio
                       <span className="char-counter">{formData.bio.length}/500</span>
                     </label>
@@ -385,6 +414,34 @@ const Profile = () => {
                       maxLength={500}
                     ></textarea>
                     <span className="helper-text">💡 Share your riding passion and experience</span>
+                  </div>
+
+                  {/* Theme Color Picker */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-icon">🎨</span>
+                      Theme Color
+                    </label>
+                    <div className="theme-colors-grid">
+                      {themeColors.map((theme) => (
+                        <div
+                          key={theme.id}
+                          className={`theme-color-option ${formData.themeColor === theme.id ? 'active' : ''}`}
+                          onClick={() => handleThemeChange(theme.id)}
+                          style={{
+                            background: theme.gradient,
+                            borderColor: formData.themeColor === theme.id ? theme.primary : 'transparent'
+                          }}
+                        >
+                          <span className="theme-icon">{theme.icon}</span>
+                          <span className="theme-name">{theme.name}</span>
+                          {formData.themeColor === theme.id && (
+                            <span className="theme-check">✓</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <span className="helper-text">🎨 Choose your favorite color theme - it will be applied across the entire app!</span>
                   </div>
 
                   <div className="form-actions-modern">
@@ -471,10 +528,7 @@ const Profile = () => {
           <div className="info-card">
             <div className="card-header-modern">
               <div className="card-title-section">
-                <h2 className="card-title">
-                  <span className="title-icon">⚡</span>
-                  Recent Activity
-                </h2>
+                <h2 className="card-title">Recent Activity</h2>
                 <p className="card-subtitle">Your latest rides and engagements</p>
               </div>
             </div>
@@ -508,17 +562,41 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Followers/Following Modal */}
-      <FollowersFollowingModal
-        isOpen={showFollowModal}
-        onClose={() => setShowFollowModal(false)}
-        userId={user?._id || ''}
-        initialTab={followModalTab}
-      />
+        {/* Followers/Following Modal */}
+        <FollowersFollowingModal
+          isOpen={showFollowModal}
+          onClose={() => setShowFollowModal(false)}
+          userId={user?._id || ''}
+          initialTab={followModalTab}
+        />
 
-      {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-    </div>
+        {/* User Communities Modal */}
+        <UserCommunitiesModal
+          isOpen={showCommunitiesModal}
+          onClose={() => {
+            setShowCommunitiesModal(false);
+            // Refresh user data when modal closes
+            const token = localStorage.getItem('token');
+            if (token) {
+              fetch('http://localhost:5000/api/auth/me', {
+                headers: { Authorization: `Bearer ${token}` }
+              }).then(res => res.json()).then(data => {
+                if (data && data.user) {
+                  localStorage.setItem('user', JSON.stringify(data.user));
+                  login(token, data.user);
+                }
+              }).catch(err => {
+                console.error('Failed to refresh user data:', err);
+              });
+            }
+          }}
+          userId={user?._id || ''}
+          showToast={showToast}
+        />
+
+        {/* Toast Notifications */}
+        <ToastContainer toasts={toasts} removeToast={removeToast} />
+      </div>
     </PageTransition>
   );
 };
